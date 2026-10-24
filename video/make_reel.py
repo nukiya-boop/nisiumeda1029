@@ -14,7 +14,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 IMG = ROOT / "images"
 OUT = ROOT / "video" / "zenen_kanpai_reel.mp4"
-BGM = ROOT / "video" / "Reserved_Table.mp3"
+BGM = ROOT / "video" / "The_Final_Toast.mp3"
+BGM_START = 1.9  # 曲頭の無音を飛ばす
 
 W, H = 1080, 1920
 FPS = 30
@@ -416,7 +417,7 @@ def main():
         "ffmpeg", "-y", "-loglevel", "error",
         "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
         "-i", str(BGM),
-        "-af", f"atrim=0:{DUR},afade=t=in:d=0.3,afade=t=out:st={DUR - 2.5}:d=2.5,loudnorm=I=-14:TP=-1.5:LRA=11",
+        "-af", f"atrim={BGM_START}:{BGM_START + DUR},asetpts=PTS-STARTPTS,afade=t=in:d=0.3,afade=t=out:st={DUR - 2.5}:d=2.5,loudnorm=I=-14:TP=-1.5:LRA=11",
         "-t", str(DUR), "-c:v", "libx264", "-preset", "slow", "-crf", "22", "-pix_fmt", "yuv420p",
         "-profile:v", "high", "-movflags", "+faststart", "-ar", "44100", "-c:a", "aac", "-b:a", "192k",
         str(OUT),
